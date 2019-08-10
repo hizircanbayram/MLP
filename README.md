@@ -23,7 +23,10 @@
 Importing necessary modules
 
 ```python
-from multi_variate_linear_regression import MultivariateLinearRegression
+from multi_variate_linear_regression import MultivariateLinearRegression 
+
+import pandas as pd  # for preprocessing the data
+import matplotlib.pyplot as plt  # for plotting the graph
 ```
 
 Loading data, preparing it for the model using numpy
