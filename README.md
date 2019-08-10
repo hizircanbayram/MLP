@@ -9,7 +9,7 @@
   * Support Vector Machines (to do)
 
 
-### MLP also covers some classes to measure various metrics so that users can see their model's progress. These are as follows:
+### MLP also covers some functions to measure various metrics so that users can see their model's progress. These are as follows:
   * Sqaured error function to understand which parameters to the function are the best based on various model tries (to do)
   * Data visualization for every dimension in the dataset and dependent variable (to do)
   * Cost function - number of iterations graph (to do)
