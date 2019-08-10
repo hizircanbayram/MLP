@@ -1,14 +1,16 @@
-# Multivariate Linear Regression implemented by Hizir Can Bayram in 10.08.2019.
+# Multivariate Linear Regression implemented by Hizir Can Bayram.
 
 import sys
 import numpy as np
 
-class MultivariateLinearRegression():
+from measuring_metrics import MeasurementMetrics
+
+class MultivariateLinearRegression(MeasurementMetrics):
     
 
     
-    
     def __init__(self, learning_rate, learning_algorithm, epoch_num):
+        MeasurementMetrics.__init__(self, epoch_num)
         self._learning_rate = learning_rate
         self._learning_algoritm = learning_algorithm
         self._epoch_num = epoch_num
@@ -49,12 +51,15 @@ class MultivariateLinearRegression():
         
         for i in range (self._epoch_num):
             hypothesis = X.dot(self._theta)
-            cost_func = np.transpose(X).dot(np.subtract(hypothesis, Y))
+            difference = np.subtract(hypothesis, Y) # hypothesis function - y values (for all training sample in the dataset, leading a vector of size m where m is the training sample in the dataset)
+            cost_val = (np.sum(difference) ** 2) / self._training_sample
+            self._cost_vals.append(cost_val)
+            cost_func = np.transpose(X).dot(difference)
             gradient = (self._learning_rate / self._training_sample) * cost_func
             self._theta = np.subtract(self._theta, gradient)
             
         self._cost_history.append(self._theta)    
-      
+        
         
         
     # Trains the model with normal equation optimization algorithm.
