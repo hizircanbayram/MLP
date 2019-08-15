@@ -16,7 +16,6 @@ class MultivariateLinearRegression(MeasurementMetrics):
         self._epoch_num = epoch_num
         self._theta = 0
         self._training_sample = 0
-        self._cost_history = []
     
     
     
@@ -57,8 +56,8 @@ class MultivariateLinearRegression(MeasurementMetrics):
             cost_func = np.transpose(X).dot(difference)
             gradient = (self._learning_rate / self._training_sample) * cost_func
             self._theta = np.subtract(self._theta, gradient)
-            
-        self._cost_history.append(self._theta)    
+        
+   
         
         
         

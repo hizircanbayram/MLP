@@ -1,24 +1,29 @@
-from multi_variate_linear_regression import MultivariateLinearRegression 
+
+from multi_variate_logic_regression import MultivariateLogisticRegression 
 
 import pandas as pd  # for preprocessing the data
 import matplotlib.pyplot as plt  # for plotting the graph
 
-datas = pd.read_csv('getting started toy datasets/multivariate_linear_regression_data.txt').to_numpy()
-X = datas[0:25,0]
-Y = datas[0:25:,1]
-X_test = datas[25:29, 0]
-Y_test = datas[25:29, 1]
+datas = pd.read_csv('getting started toy datasets/multivariate_logistic_regression_data.txt').to_numpy()
+X = datas[0:75,0:2]
+Y = datas[0:75:,2:3]
+X_test = datas[75:100, 0:2]
+Y_test = datas[75:100, 2:3]
 
-mlr = MultivariateLinearRegression(0.0001, 'Gradient Descent', 1000000) 
-mlr.train(X, Y)
+mlr = MultivariateLogisticRegression(0.0001, 1000000) 
+tets = mlr.train(X, Y)
 
 
 Y_pred = []
 for x in X_test:
     Y_pred.append(mlr.predict([x]))
+    
+true = 0
+for i in range(len(Y_pred)):
+    if Y_pred[i] == Y_test[i]:
+        true += 1
+        
+print('true : ', true)
 
-
-plt.plot(X, Y, 'bs')
-plt.plot(X_test, Y_pred, 'r') 
-plt.savefig('fig.png')
+mlr.plotCostFunction(1000000)
 

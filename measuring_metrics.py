@@ -16,7 +16,6 @@ class MeasurementMetrics():
         iters = [None] * self._iter_num
         for i in range(x_axis):
             iters[i] = i
-        
         plt.plot(iters, self._cost_vals)
         
         
