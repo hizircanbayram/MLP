@@ -17,6 +17,9 @@ class MultivariateLogisticRegression(MeasurementMetrics):
         
         
         
+    # Operates sigmoid function with the given parameter.
+    # Param | power : thetas * transpose(X)
+    # Return | : hypothesis function
     def _sigmoidFunction(self, power):
         power = -1 * power
         return 1 / (1 + (np.exp(power)))
@@ -28,21 +31,22 @@ class MultivariateLogisticRegression(MeasurementMetrics):
     # Param | X : independent variables of shape numpy array.
     # Param | Y : dependent variable of shape numpy array.
     def train(self, X, Y):
-        Y = Y.reshape((1, Y.size))
+        Y = Y.reshape((Y.size, 1))
         if len(X.shape) == 1:
             X = X.reshape((X.size, 1)) 
         bias = np.ones([X.shape[0], 1])
         X = np.concatenate((X, bias), 1)
-        self._theta = np.zeros([1, X.shape[1]])
+        self._theta = np.zeros([X.shape[1], 1])
         self._training_sample = X.shape[0]
-        
-        
+         
         for i in range (self._epoch_num):
-            hypothesis = self._sigmoidFunction(self._theta.dot(np.transpose(X)))  
+            hypothesis = self._sigmoidFunction(X.dot(self._theta))  
             difference = np.subtract(hypothesis, Y) # hypothesis function - y values (for all training sample in the dataset, leading a vector of size m where m is the training sample in the dataset)
             cost_val = (np.sum(difference) ** 2) / self._training_sample
             self._cost_vals.append(cost_val)
-            cost_func = difference.dot(X)
+            cost_func = np.transpose(X).dot(difference)
+            #print('cost func : ', cost_func.shape)
+            #break
             gradient = (self._learning_rate / self._training_sample) * cost_func
             self._theta = np.subtract(self._theta, gradient)
                
@@ -57,9 +61,9 @@ class MultivariateLogisticRegression(MeasurementMetrics):
         bias = np.ones([1]).reshape((1,1))
         if len(X.shape) == 1:
             X = X.reshape((X.size, 1)) 
-        
         X = np.concatenate((X, bias), 1)
-        if X.dot(np.transpose(self._theta))[0] >= 0.5:
+        
+        if X.dot(self._theta) >= 0.5:
             return 1
         else:
             return 0

@@ -1,5 +1,5 @@
 
-from multi_variate_logic_regression import MultivariateLogisticRegression 
+from multi_variate_logistic_regression import MultivariateLogisticRegression 
 
 import pandas as pd  # for preprocessing the data
 import matplotlib.pyplot as plt  # for plotting the graph
@@ -25,5 +25,4 @@ for i in range(len(Y_pred)):
         
 print('true : ', true)
 
-mlr.plotCostFunction(1000000)
-
+#mlr.plotCostFunction(1000000)
