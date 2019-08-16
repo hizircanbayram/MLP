@@ -14,10 +14,10 @@ Y = datas[0:75:,2:3]
 X_test = datas[75:100, 0:2]
 Y_test = datas[75:100, 2:3]
 
-mlr = MultivariateLogisticRegression(0.0001, 1000000) 
+mlr = MultivariateLogisticRegression(0.0001, 1) 
 
 
-tets = mlr.train(X, Y)
+mlr.train(X, Y)
 
 
 Y_pred = []

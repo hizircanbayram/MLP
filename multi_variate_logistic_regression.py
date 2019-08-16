@@ -11,11 +11,15 @@ class MultivariateLogisticRegression(MeasurementMetrics):
         def __init__(self, Y_train, id, feature_num):
             self._id = id
             self._labels = []
-            self._thetas = np.zeros((feature_num, 1)) # duruma gore list olarak da tanimlanabilir
+            self._thetas = np.zeros((feature_num, 1)) 
             self._label_objs = 0
             self._fillLabels(id, Y_train)
             
             
+        
+        # Creates an array that consists of 1 and 0 where 1 represents the class whose theta values are computed
+        # Param | id : id of the class whose theta parameters are computed
+        # Param | Y_train : dependent variable of shape numpy array.        
         def _fillLabels(self, id, Y_train):
             for sample in Y_train:
                 if sample == id:
@@ -24,11 +28,16 @@ class MultivariateLogisticRegression(MeasurementMetrics):
                     self._labels.append(0)
             self._labels = np.array(self._labels)
             
+            
+            
+        # Returns the id field
+        # Return | self._id : id value
         def getId(self):
             return self._id
 
 
             
+
             
     def __init__(self, learning_rate, epoch_num):
         MeasurementMetrics.__init__(self, epoch_num)
@@ -37,13 +46,21 @@ class MultivariateLogisticRegression(MeasurementMetrics):
         self._learning_rate = learning_rate
         self._epoch_num = epoch_num
  
-
     
+
+    # Trains the model and calculates the parameters of multivariate logistic regression model
+    # given as parameter.
+    # Param | X : independent variables of shape numpy array.
+    # Param | Y : dependent variable of shape numpy array.
+    # Return | self._theta : theta values for per class    
     def train(self, X, Y):
-       return self._one_vs_all(X, Y)    
+       self._one_vs_all(X, Y)    
        
 
 
+    # Returns label names in Y_train
+    # Param | Y_train : dependent variable of shape numpy array.
+    # Return | label_names : Name of labels    
     def _getLabelNames(self, Y_train):
         label_names = []
         for sample in Y_train:
@@ -51,16 +68,18 @@ class MultivariateLogisticRegression(MeasurementMetrics):
                 label_names.append(sample)
         return label_names
         
-        
     
+        
+    # Calculates theta values for every class and saves them into_label_objs
+    # Param | X_train : independent variables of shape numpy array.
+    # Param | Y_train : dependent variable of shape numpy array.
     def _one_vs_all(self, X_train, Y_train):
         label_names = self._getLabelNames(Y_train)
         self._label_objs = [self.Label(Y_train, label_names[i], X_train.shape[1]) for i in range(len(label_names))]    
         for obj in self._label_objs:
             obj._thetas = self._train(X_train, obj._labels)
-        return self._label_objs   
+           
         
-    
     
     # Operates sigmoid function with the given parameter.
     # Param | power : thetas * transpose(X)
@@ -72,9 +91,10 @@ class MultivariateLogisticRegression(MeasurementMetrics):
     
     
     # Trains the model and calculates the parameters of multivariate logistic regression model
-    # given as parameter.
+    # given as parameter for per class.
     # Param | X : independent variables of shape numpy array.
     # Param | Y : dependent variable of shape numpy array.
+    # Return | self._theta : theta values for per class
     def _train(self, X, Y):
         Y = Y.reshape((Y.size, 1))
         if len(X.shape) == 1:
@@ -92,7 +112,7 @@ class MultivariateLogisticRegression(MeasurementMetrics):
             cost_func = np.transpose(X).dot(difference)
             gradient = (self._learning_rate / self._training_sample) * cost_func
             self._theta = np.subtract(self._theta, gradient)
-        #print('thetas : ', self._theta)
+
         return self._theta
     
     
@@ -107,13 +127,8 @@ class MultivariateLogisticRegression(MeasurementMetrics):
             X = X.reshape((X.size, 1)) 
         X = np.concatenate((X, bias), 1)
         
-        max_rate = 0
-        max_id = None
-        
         preds = []
         for obj in self._label_objs:
             preds.append(X.dot(obj._thetas))
 
         return self._label_objs[preds.index(max(preds))].getId()
-
-
