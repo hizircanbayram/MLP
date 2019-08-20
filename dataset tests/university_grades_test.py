@@ -1,9 +1,12 @@
+import sys
+sys.path.append('../')
+
 from multi_variate_logistic_regression import MultivariateLogisticRegression 
 from measuring_metrics import MeasurementMetrics
 
 import pandas as pd
 
-datas = pd.read_csv('getting started toy datasets/university_grades.data').to_numpy()
+datas = pd.read_csv('../getting started toy datasets/university_grades.data').to_numpy()
 X = datas[:, 0:2]
 Y = datas[:, 2:3]
 

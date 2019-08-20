@@ -34,6 +34,8 @@ class MeasurementMetrics():
 
 
     def calculateDifference(self, Y_pred, Y_test):
+        if len(Y_test.shape) == 1:
+            Y_test = np.array(Y_test).reshape((len(Y_test), 1))
         difference = np.subtract(Y_pred, Y_test)
         absolute = abs(difference)
         return np.sum(absolute) / len(Y_test)
@@ -43,12 +45,12 @@ class MeasurementMetrics():
     def seperateTrainTest(self, X, Y, poly_deg=None):
         if poly_deg == None:
             X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.25, random_state=0)
+            return X, Y, X_train, X_test, Y_train, Y_test
         else:
             polynomial_features= PolynomialFeatures(degree=poly_deg)
             X_poly = polynomial_features.fit_transform(X)
             X_train, X_test, Y_train, Y_test = train_test_split(X_poly, Y, test_size=0.25, random_state=0)
-
-        return X_poly, Y, X_train, X_test, Y_train, Y_test
+            return X_poly, Y, X_train, X_test, Y_train, Y_test
         
     
     
@@ -84,6 +86,7 @@ class MeasurementMetrics():
         plt.show()  
         
         
+        
     def stats(self, msg, model, X_train, Y_train, X_test, Y_test, poly_deg=None):    
         Y_pred_test = []    
         for sample in X_test:
@@ -100,7 +103,7 @@ class MeasurementMetrics():
         Y_pred_train = np.asarray(Y_pred_train).reshape((len(Y_pred_train), 1))
         #rmse_train = np.sqrt(mean_squared_error(Y_train, Y_pred_train))
         #r2_train = r2_score(Y_train, Y_pred_train)    
-        
+
         print(msg)
         print('learn_rate : ', model.getLearningRate())
         print('reg_rate : ', model.getRegRate())
@@ -108,24 +111,25 @@ class MeasurementMetrics():
         print('poly_deg : ', poly_deg)   
         
         print('----- ----- TEST ----- -----')
-        print('error amount for a single sample : {0:.2f}'.format(self.calculateDifference(Y_pred_test, Y_test)))
+        if model.getName() != 'MultivariateLogisticRegression':
+            print('error amount for a single sample : {0:.2f}'.format(self.calculateDifference(Y_pred_test, Y_test)))
         print('final loss :', "{0:.2f}".format(self.getFinalCost(model), 2))
         #print('rmse : ', rmse_test)
         #print('r2 : ', r2_test)
-    
+
         print('----- ----- TRAIN ----- -----')
-        print('error amount for a single sample : {0:.2f}'.format(self.calculateDifference(Y_pred_train, Y_train), 2))
+        if model.getName() != 'MultivariateLogisticRegression':
+            print('error amount for a single sample : {0:.2f}'.format(self.calculateDifference(Y_pred_train, Y_train), 2))
         print("final loss : {0:.2f}".format(self.getFinalCost(model), 2))
         #print('rmse : ', rmse_train)
         #print('r2 : ', r2_train)
-        
-        if model.getName() == 'MultivariateLogisticRegression':
+        if model.getName() != 'MultivariateLinearRegression':      
             true = 0
             for i in range(len(X_test)):
                 if Y_test[i] == Y_pred_test[i]:
                     true += 1
             print('True prediction is : ', true, '/', len(X_test), ' for TEST')
-            
+        if model.getName() != 'MultivariateLinearRegression':
             true = 0
             for i in range(len(X_train)):
                 if Y_train[i] == Y_pred_train[i]:

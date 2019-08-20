@@ -102,6 +102,9 @@ class MultivariateLinearRegression():
 
 
 
+    def getCostVals(self):
+        return self._cost_vals
+
     def getFinalCostValue(self):
         return self._cost_vals[self._epoch_num - 1]
     

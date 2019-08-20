@@ -160,8 +160,7 @@ class MultivariateLogisticRegression():
 
     def getCostVals(self):
         return self._cost_vals
-    
-    
+       
     def getName(self):
         return self._name
     
