@@ -21,10 +21,4 @@ mlr = MultivariateLinearRegression(learning_rate=0.000001,
 mlr.train(X_train, Y_train)
 
 mm.stats('----- ----- BOSTON HOUSING ----- -----', mlr, X_train, Y_train, X_test, Y_test, poly_deg=None)
-mm.plotDecisionBoundary(mlr, X, Y)
 mm.plotCostFunction(mlr, mlr.getEpochNum())
-
-
-Y_pred = []
-for x in X_test:
-    Y_pred.append(mlr.predict([x]))

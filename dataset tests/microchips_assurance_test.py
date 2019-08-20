@@ -19,5 +19,4 @@ mlr = MultivariateLogisticRegression(learning_rate=0.02,
 mlr.train(X_train, Y_train)
 
 mm.stats('----- ----- MICROCHIPS ASSURANCE ----- -----', mlr, X_train, Y_train, X_test, Y_test, poly_deg=6)
-mm.plotDecisionBoundary(mlr, X, Y)
 mm.plotCostFunction(mlr, mlr.getEpochNum())
