@@ -10,12 +10,15 @@ class NeuralNetwork():
     # GET XIAVIAR WEIGHTS BY HANDS FROM TF AND APPLY AND SEE IF YOUR FORWARD PROP IS ACTUALLY WORKING
     class WeightParams():
         
-        def __init__(self, weights, act_func):
-            self.weights = weights
+        def __init__(self, weight, act_func):
+            self.weight = weight
             self.act_func = act_func
             
-        def getWeights(self):
-            return self.weights
+        def getWeight(self):
+            return self.weight
+        
+        def setWeight(self, weight):
+            self.weight = weight
         
         def getActFunc(self):
             return self.act_func
@@ -39,7 +42,7 @@ class NeuralNetwork():
             created_weight = self.WeightParams(np.random.rand(neuron_size, input_dim), act_func)
             self.weights.append(created_weight)
         if self.init_cnt != 0:
-            second_dim = self.weights[self.init_cnt - 1].getWeights().shape[0]
+            second_dim = self.weights[self.init_cnt - 1].getWeight().shape[0]
             created_weight = self.WeightParams(np.random.rand(neuron_size, second_dim), act_func)
             self.weights.append(created_weight)
         self.bias.append(np.zeros((neuron_size, 1)))
@@ -60,6 +63,8 @@ class NeuralNetwork():
             return self._relu(Z)
         elif act_func == 'leaky_relu':
             return self._leaky_relu(Z)
+        elif act_func == 'softmax':
+            return self._softmax(Z)
         else:
             print('Wrong activation name. Written: ', act_func)
             return
@@ -69,7 +74,7 @@ class NeuralNetwork():
         A = X
         for i in range(self.init_cnt):
             act_func = self.weights[i].getActFunc()
-            W = self.weights[i].getWeights()
+            W = self.weights[i].getWeight()
             Z = np.dot(W, A) + self.bias[i]
             A = self._calculateActivation(Z, act_func)
         return A
@@ -77,6 +82,10 @@ class NeuralNetwork():
     
     def _sigmoid(self, Z):
         return 1 / (1 + np.exp(-Z))
+    
+    
+    def _softmax(self, Z):
+        return np.exp(Z) / np.sum(np.exp(Z))
     
     
     def _tanh(self, Z):
@@ -93,8 +102,17 @@ class NeuralNetwork():
     
     def logWeights(self):
         for i in range(self.init_cnt):
-            print(self.weights[i].getWeights())
+            print(self.weights[i].getWeight())
             print()
+            
+            
+    def setWeights(self):
+        self.weights[0].setWeight(np.array([[ 0.35006494,  0.99620589,  0.05740815],
+                                            [-0.9069341,   0.27929668,  0.64960634]]))
+        self.weights[1].setWeight(np.array([[ 0.35006494,  0.99620589],
+                                            [ 0.05740815, -0.9069341 ],
+                                            [ 0.27929668,  0.64960634]]))
+        self.weights[2].setWeight(np.array([[0.39138451, 1.11379205, 0.06418427]]))
         
     
 def normalizeInput(X, axis):
@@ -115,9 +133,10 @@ sampleX = np.array([[1,7,10,12],
 sampleX = normalize(sampleX)
 
 model = NeuralNetwork()  
-model.createLayer(2, input_dim=3)
-model.createLayer(3)
-model.createLayer(1, 'sigmoid')
+model.createLayer(2, input_dim=3, act_func='sigmoid')
+model.createLayer(3, 'leaky_relu')
+model.createLayer(1, 'softmax')
+model.setWeights()
 model.logWeights()
 model.train(sampleX, None)
 #model.logWeights()
