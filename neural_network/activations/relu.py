@@ -2,10 +2,6 @@ from activation import activation
 import numpy as np
 
 class relu(activation):
-    
-    def __init__ (self):
-        activation.__init__(self)
-        a = None
 
     def activation_func(self, Z):
         return np.maximum(Z, 0)
