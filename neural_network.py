@@ -7,7 +7,7 @@ class NeuralNetwork():
     # MAKE SURE THE DATAS ARE NEXT TO EACH OTHER IN THE VERTICAL WAY
     # MAKE SURE IT IS OKAY TO HAVE BIAS WITH ZEROS BY CHECKING YOUR NOTES
     # MAKE SURE THE FORWARD PROPAGATION WORKS WITH DIFFERENT ACTIVATION FUNCTIONS
-    # GET XIAVIAR WEIGHTS BY HANDS FROM TF AND APPLY AND SEE IF YOUR FORWARD PROP IS ACTUALLY WORKING
+    
     class WeightParams():
         
         def __init__(self, weight, act_func):
@@ -28,6 +28,12 @@ class NeuralNetwork():
         self.weights = []
         self.bias = []
         self.init_cnt = 0 # keeps track of number of layers in the NN
+        self.optimizer = None
+        self.loss = None # loss(error) function's name
+        self.epoch = 0
+        self.errors = []
+        self.Zs = []
+        self.As = []
         
         
     def createLayer(self, neuron_size, act_func='relu', input_dim=None):
@@ -39,20 +45,78 @@ class NeuralNetwork():
             return
         # Either granted, self._init_cnt != 0 or input_dim != None. Not both
         if input_dim != None: # First layer
-            created_weight = self.WeightParams(np.random.rand(neuron_size, input_dim), act_func)
+            created_weight = self.WeightParams(np.random.randn(neuron_size, input_dim), act_func)
             self.weights.append(created_weight)
+            if neuron_size == 1:
+                print(created_weight.getWeight())
         if self.init_cnt != 0:
             second_dim = self.weights[self.init_cnt - 1].getWeight().shape[0]
-            created_weight = self.WeightParams(np.random.rand(neuron_size, second_dim), act_func)
+            created_weight = self.WeightParams(np.random.randn(neuron_size, second_dim), act_func)
             self.weights.append(created_weight)
+            if neuron_size == 1:
+                print(created_weight.getWeight())
         self.bias.append(np.zeros((neuron_size, 1)))
         self.init_cnt += 1
         
         
-    def train(self, X, Y, optimizer='gradient_descent'):
-        output = self._forwardPropagation(X)
-        print(output)
+    def train(self, X, Y):
+        for i in range(self.epoch):
+            predY = self._forwardPropagation(X)
+            error = self._calculateCostFunction(predY, Y)
+            self._backwardPropagation(predY, Y)            
+            self.As = []
+            self.Zs = []
+
         
+    def _forwardPropagation(self, X):
+        A = X
+        self.As.append(A)
+        for i in range(self.init_cnt):
+            act_func = self.weights[i].getActFunc()
+            W = self.weights[i].getWeight()
+            Z = np.asarray(np.dot(W, A) + self.bias[i], dtype='float64')
+            A = self._calculateActivation(Z, act_func)
+            self.Zs.append(Z)
+            self.As.append(A)
+        return A
+    
+    
+    def _backwardPropagation(self, predY, groundY):
+        dAL = - (np.divide(groundY, predY) - np.divide(1 - groundY, 1 - predY))
+        for i in reversed(range(self.init_cnt)):
+            ZL = self.Zs[i]
+            act_func = self.weights[i].getActFunc()
+            dZL = np.multiply(dAL, self._calculateActivationDrv(ZL, act_func))
+            AL1 = self.As[i]
+            m = len(predY)
+            dWL = (1 / m) * np.dot(dZL, AL1.T)
+            dbL = (1 / m) * np.sum(dZL, axis=1, keepdims=True)
+            self.weights[i].setWeight(self.weights[i].getWeight() - self.learning_rate * dWL)
+            self.bias[i] = self.bias[i] - self.learning_rate * dbL
+            dAL = np.dot(self.weights[i].getWeight().T, dZL)
+        #print(self.weights[2].getWeight())
+        
+        
+    def compileModel(self, optimizer='gradient_descent', loss='cross_entropy', 
+                           epoch=10, learning_rate=0.0001):
+        self.optimizer = optimizer
+        self.loss = loss
+        self.epoch = epoch
+        self.learning_rate = learning_rate
+
+
+    def _calculateCostFunction(self, predY, groundY):
+        if self.loss == 'cross_entropy':
+            m = len(predY)
+            error = np.squeeze((- 1 / m) * np.sum(np.multiply(groundY, np.log(predY)) + 
+                                      np.multiply((1 - groundY), np.log(1 - predY))))
+            print('error: ', error)
+            self.errors.append(error) # IT SHOULD'VE BEEN INSIDE THE COST FUNCTION WITHOUT RETURNING ERROR!
+            return error
+        else:   
+            print('Wrong typed cost function!')
+            return
+
         
     def _calculateActivation(self, Z, act_func):
         if act_func == 'sigmoid':
@@ -70,18 +134,23 @@ class NeuralNetwork():
             return
         
         
-    def _forwardPropagation(self, X):
-        A = X
-        for i in range(self.init_cnt):
-            act_func = self.weights[i].getActFunc()
-            W = self.weights[i].getWeight()
-            Z = np.dot(W, A) + self.bias[i]
-            A = self._calculateActivation(Z, act_func)
-        return A
-    
-    
+    def _calculateActivationDrv(self, Z, act_func):
+        if act_func == 'sigmoid':
+            return self._sigmoid_drv(Z)
+        elif act_func == 'relu':
+            return self._relu_drv(Z)
+        elif act_func == 'tanh':
+            return self._tanh_drv(Z)
+        else:
+            print('wrong activation drv name. Written: ', act_func)
+        
+        
     def _sigmoid(self, Z):
         return 1 / (1 + np.exp(-Z))
+    
+    
+    def _sigmoid_drv(self, Z):
+        return self._sigmoid(Z) * (1 - self._sigmoid(Z))
     
     
     def _softmax(self, Z):
@@ -92,8 +161,16 @@ class NeuralNetwork():
         return (np.exp(Z) - np.exp(-Z)) / (np.exp(Z) + np.exp(-Z))
     
     
+    def _tanh_drv(self, Z):
+        return 1 - np.square(self._tanh(Z))
+    
+    
     def _relu(self, Z):
         return np.maximum(Z, 0)
+    
+    
+    def _relu_drv(self, Z):
+        return (Z > 0) * 1
     
     
     def _leaky_relu(self, Z):
@@ -127,17 +204,39 @@ def normalizeInput(X, axis):
 
 
 from sklearn.preprocessing import normalize
+import pandas as pd
+from sklearn.model_selection import train_test_split
+'''
 sampleX = np.array([[1,7,10,12], 
                     [6,5,6,100], 
                     [10,8,2,-1]])
 sampleX = normalize(sampleX)
+'''
+
+datas = pd.read_csv('getting started toy datasets/microchips_assurance.data', sep=',',header=None).to_numpy()
+np.random.shuffle(datas)
+X = datas[:, 0:2].T
+#X = normalize(X)
+Y = datas[:, 2:3]
+'''
+for i, y in enumerate(Y):
+    if y == 'Iris-setosa':
+        Y[i] = 0
+    else:
+        Y[i] = 1
+'''
+Y = Y.T
 
 model = NeuralNetwork()  
-model.createLayer(2, input_dim=3, act_func='sigmoid')
-model.createLayer(3, 'leaky_relu')
-model.createLayer(1, 'softmax')
-model.setWeights()
-model.logWeights()
-model.train(sampleX, None)
+model.createLayer(4, input_dim=2, act_func='relu')
+model.createLayer(8, 'relu')
+model.createLayer(1, 'sigmoid')
+model.compileModel(optimizer='gradient_descent', loss='cross_entropy', 
+                   epoch=20000, learning_rate=0.001)
+model.train(X,Y)
+a_last = model._forwardPropagation(X)
 #model.logWeights()
 
+
+
+    
