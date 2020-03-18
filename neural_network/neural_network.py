@@ -1,11 +1,11 @@
 import numpy as np
-
+from optimizers.gradient_descent import gd # path.append('optimizers/') might be needed
 
 class NeuralNetwork():
 
-    # DO ANOTHER MODULE FOR INITIALIZATION
-    # DO ANOTHER MODULE FOR OPTIMIZATION ALGORITHMS
+    # DO ANOTHER MODULE FOR INITIALIZATION(it causes the NN ends up nan or not dramatically, solve this)
     # ADD PREDICT FUNCTION
+    # ERROR YAZIMINI GUNCELLE
 
     def __init__(self):
         # layer parameters
@@ -64,25 +64,15 @@ class NeuralNetwork():
     
     
     def _backwardPropagation(self, predY, groundY):
-        dAL = - (np.divide(groundY, predY) - np.divide(1 - groundY, 1 - predY))
-        for i in reversed(range(self._layer_no)):
-            ZL = self.Zs[i]
-            dZL = np.multiply(dAL, self.act_funcs[i].activation_func_drv(ZL))
-            AL1 = self.As[i] # A[l - 1]
-            m = len(predY)
-            dWL = (1 / m) * np.dot(dZL, AL1.T)
-            dbL = (1 / m) * np.sum(dZL, axis=1, keepdims=True)
-            self.weights[i] = self.weights[i] - self.learning_rate * dWL
-            self.bias[i] = self.bias[i] - self.learning_rate * dbL
-            dAL = np.dot(self.weights[i].T, dZL)
+        new_weights, new_bias = self.optimizer._backwardPropagation(predY, groundY, self)
+        self.weights = new_weights
+        self.bias = new_bias
         
         
-    def compileModel(self, optimizer='gradient_descent', loss='cross_entropy', 
-                           epoch=10, learning_rate=0.0001):
+    def compileModel(self, optimizer=gd(), loss='cross_entropy', epoch=10):
         self.optimizer = optimizer
         self.loss = loss
         self.epoch = epoch
-        self.learning_rate = learning_rate
 
 
     def _calculateCostFunction(self, predY, groundY):
