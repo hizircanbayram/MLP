@@ -76,8 +76,9 @@ class NeuralNetwork():
             W = self.weights[i]
             Z = np.asarray(np.dot(W, A) + self.bias[i], dtype='float64')
             A = self.act_funcs[i].activation_func(Z)
+        
         return np.around(A).T # check the note in train method, same explanation.
-    
+
     
     def compileModel(self, optimizer=gd(), loss='cross_entropy', epoch=10):
         self.optimizer = optimizer
@@ -150,11 +151,5 @@ class NeuralNetwork():
             print('Wrong typed cost function!')
             return
 
-    
-    def _softmax(self, Z):
-        return np.exp(Z) / np.sum(np.exp(Z))
-    
         
-    def _leaky_relu(self, Z):
-        return np.maximum(Z, 0.01*Z)        
 

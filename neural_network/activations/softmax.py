@@ -1,14 +1,14 @@
 from activation import activation
 import numpy as np
 
-class relu(activation):
-
+class softmax(activation):
+    
     def __init__(self):
-        self.name = 'relu'
+        self.name = 'softmax'
 
     def activation_func(self, Z):
-        return np.maximum(Z, 0)
+        return np.exp(Z) / np.sum(np.exp(Z), axis=0, keepdims=True)
     
     def activation_func_drv(self, Z):
-        return (Z > 0) * 1
+        pass
 

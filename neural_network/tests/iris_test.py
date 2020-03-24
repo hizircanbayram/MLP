@@ -9,9 +9,13 @@ from sklearn.preprocessing import normalize
 import pandas as pd
 import numpy as np
 
-from activations.relu import relu
+from activations.leaky_relu import leaky_relu
 from activations.sigmoid import sigmoid
 from activations.tanh import tanh
+from activations.softmax import softmax
+
+from initializations.he_init import he_init
+from initializations.xavier_init import xavier_init
 
 from optimizers.gradient_descent import gd
 
@@ -26,22 +30,29 @@ Y = datas[:, 4:5]
 for i, y in enumerate(Y):
     if y == 'Iris-setosa':
         Y[i] = 0
-    else:
+    elif y == 'Iris-versicolor':
         Y[i] = 1
+    else:
+        Y[i] = 2
+        
+Y = np.array(Y, dtype='int32').T
 
-X_train = X[0:70,:]
-X_test = X[70:100,:]
+Y_onehot = np.zeros((Y.size, Y.max()+1), dtype='int32')
+Y_onehot[np.arange(Y.size),Y] = 1
 
-Y_train = Y[0:70,:]
-Y_test = Y[70:100,:]
+X_train = X[0:120,:]
+X_test = X[120:150,:]
+
+Y_train = Y_onehot[0:120,:]
+Y_test = Y_onehot[120:150,:]
 
 model = NeuralNetwork()  
-model.createLayer(8, input_dim=4, act_func=relu())
-model.createLayer(8, act_func=tanh())
-model.createLayer(8, act_func=relu())
-model.createLayer(1, act_func=sigmoid())
+model.createLayer(8, input_dim=4, act_func=leaky_relu(), weight_init=he_init())
+model.createLayer(8, act_func=tanh(), weight_init=xavier_init())
+model.createLayer(8, act_func=leaky_relu(), weight_init=he_init())
+model.createLayer(3, act_func=softmax())
 model.compileModel(optimizer=gd(), loss='cross_entropy', 
-                   epoch=500)
+                   epoch=5000)
 model.train(X_train,Y_train)
 Y_pred = model.predict(X_test)
 print(measureAccuracy(Y_pred, Y_test))

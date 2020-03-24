@@ -2,7 +2,8 @@ from activation import activation
 import numpy as np
 
 class tanh(activation):
-    
+    def __init__(self):
+        self.name = 'tanh'    
     
     def activation_func(self, Z):
         return (np.exp(Z) - np.exp(-Z)) / (np.exp(Z) + np.exp(-Z))
