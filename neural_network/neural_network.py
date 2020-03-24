@@ -1,5 +1,12 @@
 import numpy as np
-from optimizers.gradient_descent import gd # path.append('optimizers/') might be needed
+import sys
+sys.path.append('optimizers/') # might be needed
+sys.path.append('initializers/')
+sys.path.append('activations/')
+
+from optimizers.gradient_descent import gd
+from activations.relu import relu
+from initializations.standart_normal import standart_normal
 
 class NeuralNetwork():
 
@@ -25,7 +32,7 @@ class NeuralNetwork():
         self.As = []
         
         
-    def createLayer(self, neuron_size, act_func, input_dim=None):
+    def createLayer(self, neuron_size, act_func=relu(), weight_init=standart_normal(), input_dim=None):
         if self._layer_no == 0 and input_dim == None:
             print('Input size has to be determined')
             return
@@ -34,10 +41,10 @@ class NeuralNetwork():
             return
         # Either granted, self._init_cnt != 0 or input_dim != None. Not both
         if input_dim != None: # First layer
-            created_weight = np.random.randn(neuron_size, input_dim)
+            created_weight = weight_init.initializeWeights(neuron_size, input_dim)
         if self._layer_no != 0:
             second_dim = self.weights[self._layer_no - 1].shape[0]
-            created_weight = np.random.randn(neuron_size, second_dim)
+            created_weight = weight_init.initializeWeights(neuron_size, second_dim)
         self.weights.append(created_weight)
         self.bias.append(np.zeros((neuron_size, 1)))
         self.act_funcs.append(act_func)
@@ -62,7 +69,26 @@ class NeuralNetwork():
             self.As = []
             self.Zs = []
 
+
+    def predict(self, X):
+        A = X.T # check the note in train method, same explanation.
+        for i in range(self._layer_no):
+            W = self.weights[i]
+            Z = np.asarray(np.dot(W, A) + self.bias[i], dtype='float64')
+            A = self.act_funcs[i].activation_func(Z)
+        return np.around(A).T # check the note in train method, same explanation.
+    
+    
+    def compileModel(self, optimizer=gd(), loss='cross_entropy', epoch=10):
+        self.optimizer = optimizer
+        self.loss = loss
+        self.epoch = epoch
         
+
+    def getErrors(self):
+        return self.errors
+    
+    
     def _forwardPropagation(self, X):
         A = X
         self.As.append(A)
@@ -74,26 +100,11 @@ class NeuralNetwork():
             self.As.append(A)
         return A
     
-    
-    def predict(self, X):
-        A = X.T # check the note in train method, same explanation.
-        for i in range(self._layer_no):
-            W = self.weights[i]
-            Z = np.asarray(np.dot(W, A) + self.bias[i], dtype='float64')
-            A = self.act_funcs[i].activation_func(Z)
-        return np.around(A).T # check the note in train method, same explanation.
-    
-    
+
     def _backwardPropagation(self, predY, groundY):
         new_weights, new_bias = self.optimizer._backwardPropagation(predY, groundY, self)
         self.weights = new_weights
         self.bias = new_bias
-        
-        
-    def compileModel(self, optimizer=gd(), loss='cross_entropy', epoch=10):
-        self.optimizer = optimizer
-        self.loss = loss
-        self.epoch = epoch
       
         
     def _log_epoch_helper(self, boundry, epoch_no, error, Y_pred, Y_train):
@@ -122,6 +133,10 @@ class NeuralNetwork():
             self._log_epoch_helper(5000, current_epoch, error, Y_pred, Y_train)
         elif self.epoch <= 10000:
             self._log_epoch_helper(10000, current_epoch, error, Y_pred, Y_train)
+        elif self.epoch <= 100000:
+            self._log_epoch_helper(100000, current_epoch, error, Y_pred, Y_train)
+        else:
+            self._log_epoch_helper(100000, current_epoch, error, Y_pred, Y_train)
         
 
     def _calculateCostFunction(self, predY, groundY):
@@ -134,10 +149,6 @@ class NeuralNetwork():
         else:   
             print('Wrong typed cost function!')
             return
-        
-        
-    def getErrors(self):
-        return self.errors
 
     
     def _softmax(self, Z):

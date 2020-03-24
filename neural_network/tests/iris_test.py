@@ -41,7 +41,7 @@ model.createLayer(8, act_func=tanh())
 model.createLayer(8, act_func=relu())
 model.createLayer(1, act_func=sigmoid())
 model.compileModel(optimizer=gd(), loss='cross_entropy', 
-                   epoch=50)
+                   epoch=500)
 model.train(X_train,Y_train)
 Y_pred = model.predict(X_test)
 print(measureAccuracy(Y_pred, Y_test))
