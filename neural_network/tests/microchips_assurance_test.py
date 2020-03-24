@@ -14,6 +14,7 @@ from activations.tanh import tanh
 
 from optimizers.gradient_descent import gd
 
+from measuring_metrics import *
 
 datas = pd.read_csv('microchips_assurance.data', sep=',',header=None).to_numpy()
 np.random.shuffle(datas)
@@ -36,4 +37,5 @@ model.compileModel(optimizer=gd(), loss='cross_entropy',
                    epoch=10000)
 model.train(X_train, Y_train)
 Y_pred = model.predict(X_test)
-subt = (100 - (100 * np.sum(np.absolute(Y_pred - Y_test))) / len(Y_test))
+print(measureAccuracy(Y_pred, Y_test))
+plotLearningGraph(model.getErrors())

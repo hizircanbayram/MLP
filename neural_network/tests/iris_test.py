@@ -15,7 +15,7 @@ from activations.tanh import tanh
 
 from optimizers.gradient_descent import gd
 
-
+from measuring_metrics import *
 
 datas = pd.read_csv('iris_nn.data', sep=',',header=None).to_numpy()
 np.random.shuffle(datas)
@@ -44,3 +44,5 @@ model.compileModel(optimizer=gd(), loss='cross_entropy',
                    epoch=50)
 model.train(X_train,Y_train)
 Y_pred = model.predict(X_test)
+print(measureAccuracy(Y_pred, Y_test))
+plotLearningGraph(model.getErrors())
