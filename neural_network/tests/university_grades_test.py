@@ -18,9 +18,15 @@ from optimizers.gradient_descent import gd
 
 datas = pd.read_csv('university_grades.data', sep=',',header=None).to_numpy()
 np.random.shuffle(datas)
-X = datas[:, 0:2].T
+X = datas[:, 0:2]
 X = normalize(X)
-Y = datas[:, 2:3].T
+Y = datas[:, 2:3]
+
+X_train = X[0:90, :]
+X_test = X[90:100, :]
+
+Y_train = Y[0:90, :]
+Y_test = Y[90:100, :]
 
 model = NeuralNetwork()  
 model.createLayer(8, input_dim=2, act_func=relu())
@@ -28,5 +34,5 @@ model.createLayer(8, act_func=relu())
 model.createLayer(1, act_func=sigmoid())
 model.compileModel(optimizer=gd(), loss='cross_entropy', 
                    epoch=10000)
-model.train(X,Y)
-a_last = model._forwardPropagation(X)
+model.train(X_train, Y_train)
+Y_pred = model.predict(X_test)
