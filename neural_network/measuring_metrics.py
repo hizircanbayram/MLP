@@ -4,7 +4,11 @@ def measureAccuracy(Y_pred, Y_test):
     if len(Y_pred) != len(Y_test):
         print('len(Y_pred):', len(Y_pred), 'len(Y_test):', len(Y_test), 'correct it.')
         return
-    return 100 - (100 * np.sum(np.absolute(Y_pred - Y_test))) / len(Y_test)
+    equal_no = 0
+    for i in range(len(Y_pred)):
+        if np.array_equal(Y_pred[i], Y_test[i]):
+            equal_no += 1
+    return "{0:,.3f}".format(100 * equal_no / len(Y_test))
 
 
 def plotLearningGraph(errors):

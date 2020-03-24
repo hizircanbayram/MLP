@@ -112,9 +112,18 @@ class NeuralNetwork():
         # if epoch_no % (boundry // 10) == 0, this means it'll log the current
         # situation ten times for the entire training
         if (epoch_no == self.epoch - 1) or (epoch_no % (boundry // 10) == 0):
+            '''
+            Let be Y_test: [1,0,0], Y_pred: [0,1,1]. There are a lot of case like, 
+            summing as shown below may be surpass 100. So 100 - >100 number will lead
+            negative accuracy. This mostly occurs in the very epochs of learning. Thus
+            I prefer to ignore that because I couldn't find a better version using numpy
+            arrays. If I didn't use numpy arrays, I mean normal lists, it multiplied the
+            training duration twice. This is huge because even the forward and backward
+            prop don't add that much of time complexity.
+            '''
             print(str(epoch_no + 1) + '.', 'epoch, error:', 
                   "{0:,.3f}".format(error), 'train acc: ',
-                  "{0:,.3f}".format(100 - (100 * np.sum(np.absolute(Y_pred - Y_train))) / len(Y_train)))    
+                  "{0:,.3f}".format(100 - (100 * (np.sum(np.absolute(Y_pred - Y_train))) / len(Y_train))))    
     
         
     def _logHelper(self, current_epoch, error, Y_pred, Y_train):
@@ -150,6 +159,4 @@ class NeuralNetwork():
         else:   
             print('Wrong typed cost function!')
             return
-
-        
 

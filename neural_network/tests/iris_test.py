@@ -9,7 +9,7 @@ from sklearn.preprocessing import normalize
 import pandas as pd
 import numpy as np
 
-from activations.leaky_relu import leaky_relu
+from activations.relu import relu
 from activations.sigmoid import sigmoid
 from activations.tanh import tanh
 from activations.softmax import softmax
@@ -47,9 +47,9 @@ Y_train = Y_onehot[0:120,:]
 Y_test = Y_onehot[120:150,:]
 
 model = NeuralNetwork()  
-model.createLayer(8, input_dim=4, act_func=leaky_relu(), weight_init=he_init())
+model.createLayer(8, input_dim=4, act_func=relu(), weight_init=he_init())
 model.createLayer(8, act_func=tanh(), weight_init=xavier_init())
-model.createLayer(8, act_func=leaky_relu(), weight_init=he_init())
+model.createLayer(8, act_func=relu(), weight_init=he_init())
 model.createLayer(3, act_func=softmax())
 model.compileModel(optimizer=gd(), loss='cross_entropy', 
                    epoch=5000)
