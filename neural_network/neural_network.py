@@ -122,7 +122,7 @@ class NeuralNetwork():
             self._log_epoch_helper(5000, current_epoch, error, Y_pred, Y_train)
         elif self.epoch <= 10000:
             self._log_epoch_helper(10000, current_epoch, error, Y_pred, Y_train)
-
+        
 
     def _calculateCostFunction(self, predY, groundY):
         if self.loss == 'cross_entropy':
@@ -134,6 +134,10 @@ class NeuralNetwork():
         else:   
             print('Wrong typed cost function!')
             return
+        
+        
+    def getErrors(self):
+        return self.errors
 
     
     def _softmax(self, Z):
