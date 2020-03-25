@@ -14,6 +14,7 @@ from initializations.standart_normal import standart_normal
 class NeuralNetwork():
 
     # SAVING & LOADING MODELS
+    # BATCHES NEED TO BE ITERATED BEFORE EPOCHS. IT SEEMS HARD IN THIS SETUP. SOLVE IT.
     # REAL TIME HAND DIGIT CLASSIFIER USING THIS FRAMEWORK
     
     def __init__(self):
@@ -26,6 +27,7 @@ class NeuralNetwork():
         self.optimizer = None
         self.loss_func = None # loss(error) function's name
         self.epoch = 0
+        self.current_epoch = 0
         # cache
         self.errors = []
         self.Zs = []
@@ -62,6 +64,7 @@ class NeuralNetwork():
         X = X.T
         Y = Y.T
         for i in range(self.epoch):
+            self.current_epoch += 1
             predY = self._forwardPropagation(X)
             error = self.loss_func.calculateCostFunction(predY, Y)
             self.errors.append(error)
