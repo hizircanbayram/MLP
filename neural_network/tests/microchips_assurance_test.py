@@ -14,6 +14,8 @@ from activations.tanh import tanh
 
 from optimizers.gradient_descent import gd
 
+from cost_functions.binary_crossentropy import binary_crossentropy
+
 from measuring_metrics import *
 
 datas = pd.read_csv('microchips_assurance.data', sep=',',header=None).to_numpy()
@@ -33,7 +35,7 @@ model.createLayer(16, act_func=tanh())
 model.createLayer(16, act_func=relu())
 model.createLayer(8, act_func=relu())
 model.createLayer(1, act_func=sigmoid())
-model.compileModel(optimizer=gd(), loss='cross_entropy', 
+model.compileModel(optimizer=gd(), loss_func=binary_crossentropy(), 
                    epoch=10000)
 model.train(X_train, Y_train)
 Y_pred = model.predict(X_test)

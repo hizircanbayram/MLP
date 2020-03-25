@@ -17,9 +17,12 @@ from activations.softmax import softmax
 from initializations.he_init import he_init
 from initializations.xavier_init import xavier_init
 
+from cost_functions.categorical_crossentropy import categorical_crossentropy
+
 from optimizers.gradient_descent import gd
 
 from measuring_metrics import *
+from utils import *
 
 datas = pd.read_csv('iris_nn.data', sep=',',header=None).to_numpy()
 np.random.shuffle(datas)
@@ -35,10 +38,8 @@ for i, y in enumerate(Y):
     else:
         Y[i] = 2
         
-Y = np.array(Y, dtype='int32').T
-
-Y_onehot = np.zeros((Y.size, Y.max()+1), dtype='int32')
-Y_onehot[np.arange(Y.size),Y] = 1
+Y = np.array(Y, dtype='int32')
+Y_onehot = convert_one_hot(Y)
 
 X_train = X[0:120,:]
 X_test = X[120:150,:]
@@ -51,7 +52,7 @@ model.createLayer(8, input_dim=4, act_func=relu(), weight_init=he_init())
 model.createLayer(8, act_func=tanh(), weight_init=xavier_init())
 model.createLayer(8, act_func=relu(), weight_init=he_init())
 model.createLayer(3, act_func=softmax())
-model.compileModel(optimizer=gd(), loss='cross_entropy', 
+model.compileModel(optimizer=gd(), loss_func=categorical_crossentropy(), 
                    epoch=5000)
 model.train(X_train,Y_train)
 Y_pred = model.predict(X_test)
