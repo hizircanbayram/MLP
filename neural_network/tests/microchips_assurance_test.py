@@ -12,7 +12,7 @@ from activations.relu import relu
 from activations.sigmoid import sigmoid
 from activations.tanh import tanh
 
-from optimizers.gradient_descent import gd
+from optimizers.RMSprop import RMSprop
 
 from cost_functions.binary_crossentropy import binary_crossentropy
 
@@ -35,7 +35,7 @@ model.createLayer(16, act_func=tanh())
 model.createLayer(16, act_func=relu())
 model.createLayer(8, act_func=relu())
 model.createLayer(1, act_func=sigmoid())
-model.compileModel(optimizer=gd(), loss_func=binary_crossentropy(), 
+model.compileModel(optimizer=Adam(), loss_func=binary_crossentropy(), 
                    epoch=10000)
 model.train(X_train, Y_train)
 Y_pred = model.predict(X_test)

@@ -19,7 +19,7 @@ from initializations.xavier_init import xavier_init
 
 from cost_functions.categorical_crossentropy import categorical_crossentropy
 
-from optimizers.gradient_descent import gd
+from optimizers.Adam import Adam
 
 from measuring_metrics import *
 from utils import *
@@ -52,7 +52,7 @@ model.createLayer(8, input_dim=4, act_func=relu(), weight_init=he_init())
 model.createLayer(8, act_func=tanh(), weight_init=xavier_init())
 model.createLayer(8, act_func=relu(), weight_init=he_init())
 model.createLayer(3, act_func=softmax())
-model.compileModel(optimizer=gd(), loss_func=categorical_crossentropy(), 
+model.compileModel(optimizer=Adam(), loss_func=categorical_crossentropy(), 
                    epoch=5000)
 model.train(X_train,Y_train)
 Y_pred = model.predict(X_test)
