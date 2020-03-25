@@ -1,18 +1,18 @@
 import numpy as np
 import sys
+
 sys.path.append('optimizers/') # might be needed
 sys.path.append('initializers/')
 sys.path.append('activations/')
+sys.path.append('cost_functions')
 
 from optimizers.gradient_descent import gd
+from cost_functions.categorical_crossentropy import categorical_crossentropy
 from activations.relu import relu
 from initializations.standart_normal import standart_normal
 
 class NeuralNetwork():
 
-    # DO ANOTHER MODULE FOR INITIALIZATION(it causes the NN ends up nan or not dramatically, solve this)
-    # ADD ANOTHER ACTIVATIONS SUCH AS LEAKY_RELU, SOFTMAX
-    # DO ANOTHER MODULE FOR LOSS FUNCTION
     # SAVING & LOADING MODELS
     # REAL TIME HAND DIGIT CLASSIFIER USING THIS FRAMEWORK
     
@@ -24,7 +24,7 @@ class NeuralNetwork():
         self._layer_no = 0 # keeps track of number of layers in the NN
         # model parameters
         self.optimizer = None
-        self.loss = None # loss(error) function's name
+        self.loss_func = None # loss(error) function's name
         self.epoch = 0
         # cache
         self.errors = []
@@ -63,7 +63,8 @@ class NeuralNetwork():
         Y = Y.T
         for i in range(self.epoch):
             predY = self._forwardPropagation(X)
-            error = self._calculateCostFunction(predY, Y)
+            error = self.loss_func.calculateCostFunction(predY, Y)
+            self.errors.append(error)
             self._logHelper(i, error, self.predict(X.T), Y.T)
             self._backwardPropagation(predY, Y)            
             self.As = []
@@ -80,9 +81,9 @@ class NeuralNetwork():
         return np.around(A).T # check the note in train method, same explanation.
 
     
-    def compileModel(self, optimizer=gd(), loss='cross_entropy', epoch=10):
+    def compileModel(self, optimizer=gd(), loss_func=categorical_crossentropy(), epoch=10):
         self.optimizer = optimizer
-        self.loss = loss
+        self.loss_func = loss_func
         self.epoch = epoch
         
 
@@ -147,16 +148,3 @@ class NeuralNetwork():
             self._log_epoch_helper(100000, current_epoch, error, Y_pred, Y_train)
         else:
             self._log_epoch_helper(100000, current_epoch, error, Y_pred, Y_train)
-        
-
-    def _calculateCostFunction(self, predY, groundY):
-        if self.loss == 'cross_entropy':
-            m = len(predY)
-            error = np.squeeze((- 1 / m) * np.sum(np.multiply(groundY, np.log(predY)) + 
-                                      np.multiply((1 - groundY), np.log(1 - predY))))
-            self.errors.append(error) 
-            return error
-        else:   
-            print('Wrong typed cost function!')
-            return
-

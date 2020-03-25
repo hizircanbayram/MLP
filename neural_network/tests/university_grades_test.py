@@ -15,6 +15,8 @@ from activations.tanh import tanh
 
 from optimizers.gradient_descent import gd
 
+from cost_functions.binary_crossentropy import binary_crossentropy
+
 from initializations.he_init import he_init
 
 from measuring_metrics import *
@@ -35,7 +37,7 @@ model = NeuralNetwork()
 model.createLayer(8, input_dim=2, act_func=relu(), weight_init=he_init())
 model.createLayer(8, act_func=relu(), weight_init=he_init())
 model.createLayer(1, act_func=sigmoid())
-model.compileModel(optimizer=gd(), loss='cross_entropy', 
+model.compileModel(optimizer=gd(), loss_func=binary_crossentropy(), 
                    epoch=20000)
 model.train(X_train, Y_train)
 Y_pred = model.predict(X_test)
